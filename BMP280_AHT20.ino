@@ -1,10 +1,15 @@
 #include <Adafruit_AHTX0.h>
 #include <Adafruit_BMP280.h>
 
+#include <BluetoothSerial.h>
+
+BluetoothSerial ESP_BT;
+
 Adafruit_BMP280 bmp;  // I2C
 Adafruit_AHTX0 aht;
 
 void setup() {
+  ESP_BT.begin("ENV_Sensors");
   Serial.begin(115200);
   while (!Serial) delay(100);  // wait for native usb
   Serial.println(F("BMP280 test"));
@@ -36,6 +41,7 @@ void setup() {
     while (1) delay(10);
   }
   Serial.println("AHT10 or AHT20 found");
+  Serial.println("Setup Complete");
 }
 
 void loop() {
@@ -52,7 +58,20 @@ void loop() {
   Serial.println(" m");
 
   Serial.println();
+
+  ESP_BT.print("Temperature: ");
+  ESP_BT.print(temp.temperature);
+  ESP_BT.println(" degrees C");
+  ESP_BT.print("Humidity: ");
+  ESP_BT.print(humidity.relative_humidity);
+  ESP_BT.println("% rH");
+  ESP_BT.print(F("Approx altitude = "));
+  ESP_BT.print(bmp.readAltitude(1013.25)); /* Adjusted to local forecast! */
+  ESP_BT.println(" m");
+
+  ESP_BT.println();
+
   digitalWrite(BUILTIN_LED, HIGH);
-  delay(500);
+  delay(1000);
   digitalWrite(BUILTIN_LED, LOW);
 }
